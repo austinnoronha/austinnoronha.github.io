@@ -1,7 +1,79 @@
+<?php
+##########################################################################
+# @file: spamdesk.php
+# @desc: Fetch Spam URL from http://202.137.234.105/forspamdesk.php
+# @date: 06-06-2103
+##########################################################################
+
+function onScreen($s)
+{
+	$s = str_replace("\n","<br/>",$s);
+	echo '<div style="width:97%;margin:10px auto;border:3px solid #eee;padding:5px">'.$s.'</div>';
+}
+
+function sendRequestToServer($p_str_server, $p_str_url, $p_int_portno=80, $p_str_qrystring, $p_bln_usecookie=false, $p_str_UA = "",$uselocalhost='')
+{
+	$http_request   = "GET " . $p_str_url;
+	if (! empty($p_str_qrystring))
+	{
+		$http_request .= "?" . $p_str_qrystring;
+	}
+	$http_request .= " HTTP/1.1\r\n";
+
+	if(!$uselocalhost)
+		$http_request  .= "Host: " . $p_str_server . "\r\n";
+	else
+		$http_request  .= "Host: " . $uselocalhost . "\r\n";
+
+	if (! empty($p_str_UA))
+	{
+		$http_request  .= "User-Agent: " . $p_str_UA . "\r\n";
+	}
+	if($p_bln_usecookie == true)
+	{
+		$http_request  .= "Cookie: Rm=" . $_COOKIE['Rm'] . "; Rsc=" . $_COOKIE['Rsc'] . ";Rl=" . $_COOKIE['Rl'] . ";Rt=". $_COOKIE['Rt']. ";accounttype=". $_COOKIE['accounttype']. ";Rlo=". $_COOKIE['Rlo'] . "\r\n";
+	}
+	$http_request  .= "Connection: close\r\n";
+	$http_request  .= "\r\n";
+
+	onScreen($http_request);exit();
+	$fp = @fsockopen($p_str_server, $p_int_portno, $errno, $errstr, 5);
+	if($fp)
+	{
+		fputs($fp, $http_request);
+		stream_set_timeout($fp, 10);
+		while (!feof($fp))
+		{
+			$tmp_str_result .= fgets($fp, 128);
+		}
+		$response = split("\r\n\r\n",$tmp_str_result);
+		$header   = $response[0];		
+		$responsecontent = trim($response[1]);
+		onScreen($header);
+		onScreen($responsecontent);
+		return $responsecontent;
+	}
+	else
+	{
+		error_log("socketconnectionerror"." error no:".$errno." Error message:".$errstr);
+		unset($fp);
+		return false;
+	}
+	fclose($fp);
+	unset($fp);
+}
+
+$p_str_server = "202.137.234.105"; 
+$p_str_url = "/forspamdesk.php"; 
+$p_int_portno=80; 
+$p_str_qrystring = "";
+//$tmp_res = sendRequestToServer($p_str_server, $p_str_url, $p_int_portno, $p_str_qrystring);
+//EOF - spamdesk.php
+?>
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Austin Noronha - Hosted with GitHub Pages</title>
+    <title>Bootstrap 101 Template</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Bootstrap -->
     <link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
