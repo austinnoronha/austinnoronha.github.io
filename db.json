@@ -1,0 +1,11 @@
+{
+  "posts": [
+    {
+      "id": 1,
+      "title": "Hello world!"
+    }
+  ],
+  "profile": {
+    "name": "buzzingcode"
+  }
+}
